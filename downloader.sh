@@ -10,7 +10,7 @@ if [[ ! -f $INPUT_FILE ]]; then
 fi
 
 # Create a directory to store downloaded .torrent files
-DOWNLOAD_DIR="downloaded_torrents"
+DOWNLOAD_DIR="~/torrents_watch"
 mkdir -p "$DOWNLOAD_DIR"
 
 # Process each block in the input file
