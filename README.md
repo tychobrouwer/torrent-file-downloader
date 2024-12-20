@@ -14,7 +14,7 @@ Organizes downloads in the ```downloaded_torrents``` folder.
 
 ## Prerequisites
 
-```curl``` must be installed.
+```curl``` and ```lynx``` are required to run this script.
 
 ## Usage
 
