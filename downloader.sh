@@ -33,24 +33,26 @@ while IFS= read -r line; do
     continue
   fi
 
+  TYPE=$(echo $TYPE | tr -d '\r')
+  URL=$(echo $URL | tr -d '\r')
+  REGEX=$(echo $REGEX | tr -d '\r')
+
   # Ensure TYPE and URL are set
   if [[ -n "$TYPE" && -n "$URL" ]]; then
     if [[ "$TYPE" == "directory" && -n "$REGEX" ]]; then
       echo "Processing directory: $URL"
 
       # Fetch the list of files from the URL
-      HTML_CONTENT=$(curl -s "$URL")
+      LINKS="$(lynx -dump -listonly -hiddenlinks=listonly $URL | awk '{print $2}' | uniq)"
 
-      if [[ -z "$HTML_CONTENT" ]]; then
+      if [[ -z "$LINKS" ]]; then
         echo "Failed to fetch content from $URL."
         continue
       fi
 
-      # Use provided REGEX or default to matching .torrent files
-      MATCH_REGEX="${REGEX:-.*\\.torrent$}"
-
       # Extract matching links
-      MATCHING_LINKS=$(echo "$HTML_CONTENT" | grep -oP "href=\"\K[^\"]+" | grep -E "$MATCH_REGEX")
+      TORRENT_LINKS=$(echo "$LINKS" | grep -E "^.*\\.torrent$")
+      MATCHING_LINKS=$(echo "$TORRENT_LINKS" | grep -P "$REGEX")
 
       if [[ -z "$MATCHING_LINKS" ]]; then
         echo "No matching files found at $URL."
@@ -96,10 +98,7 @@ while IFS= read -r line; do
       URL=""
       REGEX=""
 
-    else
-      echo "Invalid TYPE: $TYPE"
     fi
-
   fi
 
 done <"$INPUT_FILE"
