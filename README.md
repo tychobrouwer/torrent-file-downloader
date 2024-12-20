@@ -24,6 +24,7 @@ Organizes downloads in the ```downloaded_torrents``` folder.
     TYPE=directory
     URL=<https://example.com/path/to/torrents>
     REGEX=.*debian.*\.torrent$
+    SUFFIX=
 
     TYPE=file
     URL=<https://example.com/path/to/file.torrent>
@@ -32,6 +33,7 @@ Organizes downloads in the ```downloaded_torrents``` folder.
     + TYPE: directory or file.
     + URL: Resource URL.
     + REGEX: Optional for filtering; defaults to .*\.torrent$.
+    + SUFFIX: Optional for finding torrent files with a specific suffix.
 
 2. Run the script:
 

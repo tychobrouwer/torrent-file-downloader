@@ -5,7 +5,7 @@ INPUT_FILE="input.txt"
 
 if [[ ! -f $INPUT_FILE ]]; then
   echo "Input file '$INPUT_FILE' not found! Please create it with the following format:"
-  echo -e "TYPE=directory|file\nURL=https://example.com/path/to/resource\nREGEX=optional_regex\n\nRepeat the above lines for multiple entries."
+  echo -e "TYPE=directory|file\nURL=https://example.com/path/to/resource\nREGEX=optional_regex\n\nRepeat the above lines for multiple entries"
   exit 1
 fi
 
@@ -13,13 +13,21 @@ fi
 DOWNLOAD_DIR="watched"
 mkdir -p "$DOWNLOAD_DIR"
 
+echo "" >>"$INPUT_FILE"
+
 # Process each block in the input file
 TYPE=""
 URL=""
 REGEX=""
+SUFFIX=""
+
+process=0
+
 while IFS= read -r line; do
+  line=$(echo $line | tr -d '\r')
+
   # Skip lines not starting with TYPE, URL, or REGEX
-  if [[ ! "$line" =~ ^TYPE= && ! "$line" =~ ^URL= && ! "$line" =~ ^REGEX= ]]; then
+  if [[ ! "$line" =~ ^TYPE= && ! "$line" =~ ^URL= && ! "$line" =~ ^REGEX= && ! "$line" =~ ^SUFFIX= && $line != "" ]]; then
     continue
   fi
 
@@ -30,19 +38,19 @@ while IFS= read -r line; do
     URL="${BASH_REMATCH[1]}"
   elif [[ "$line" =~ ^REGEX=(.+)$ ]]; then
     REGEX="${BASH_REMATCH[1]}"
+  elif [[ "$line" =~ ^SUFFIX=(.+)$ ]]; then
+    SUFFIX="${BASH_REMATCH[1]}"
+  elif [[ "$line" == "" ]]; then
+    process=1
   else
     echo "Invalid line in input file: $line"
     continue
   fi
 
-  TYPE=$(echo $TYPE | tr -d '\r')
-  URL=$(echo $URL | tr -d '\r')
-  REGEX=$(echo $REGEX | tr -d '\r')
-
   random_chars=$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c 8)
 
   # Ensure TYPE and URL are set
-  if [[ -n "$TYPE" && -n "$URL" ]]; then
+  if [[ process -eq 1 ]]; then
     # Select lastest directory from URL
     if [[ "$TYPE" == "select-latest-directory" ]]; then
       echo "Processing latest directory: $URL"
@@ -51,7 +59,7 @@ while IFS= read -r line; do
       LINKS="$(lynx -dump -listonly -hiddenlinks=listonly $URL?r=$random_chars | awk '{print $2}' | uniq)"
 
       if [[ -z "$LINKS" ]]; then
-        echo "Failed to fetch content from $URL."
+        echo "Failed to fetch content from $URL"
         continue
       fi
 
@@ -59,7 +67,7 @@ while IFS= read -r line; do
       DIRECTORIES=$(echo "$LINKS" | grep -E "^.*\/$")
 
       if [[ -z "$DIRECTORIES" ]]; then
-        echo "No directories found at $URL."
+        echo "No directories found at $URL"
         continue
       fi
 
@@ -68,28 +76,30 @@ while IFS= read -r line; do
       URL=$(echo "$DIRECTORIES" | sort -r | head -n 1)
 
       if [[ -z "$URL" ]]; then
-        echo "Failed to select the latest directory from $URL."
+        echo "Failed to select the latest directory from $URL"
         continue
       fi
     fi
 
     # Select lastest file from URL
-    if [[ "$TYPE" == "select-latest-file" && -n "$REGEX" ]]; then
+    if [[ "$TYPE" == "select-latest-file" ]]; then
       echo "Processing latest file: $URL"
 
       # Fetch the list of files from the URL
       LINKS="$(lynx -dump -listonly -hiddenlinks=listonly $URL?r=$random_chars | awk '{print $2}' | uniq)"
 
       if [[ -z "$LINKS" ]]; then
-        echo "Failed to fetch content from $URL."
+        echo "Failed to fetch content from $URL"
         continue
       fi
 
-      TORRENT_LINKS=$(echo "$LINKS" | grep -E "^.*\\.torrent$")
-      MATCHING_LINKS=$(echo "$TORRENT_LINKS" | grep -P "$REGEX")
+      MATCHING_LINKS=$(echo "$LINKS")
+      if [[ -n "$REGEX" ]]; then
+        MATCHING_LINKS=$(echo "$LINKS" | grep -P "$REGEX")
+      fi
 
       if [[ -z "$MATCHING_LINKS" ]]; then
-        echo "No matching files found at $URL."
+        echo "No matching files found at $URL"
         continue
       fi
 
@@ -98,28 +108,30 @@ while IFS= read -r line; do
       URL=$(echo "$MATCHING_LINKS" | sort -r | head -n 1)
 
       if [[ -z "$URL" ]]; then
-        echo "Failed to select the latest file from $URL."
+        echo "Failed to select the latest file from $URL"
         continue
       fi
     fi
 
-    if [[ "$TYPE" == "from-directory" && -n "$REGEX" ]]; then
+    if [[ "$TYPE" == "from-directory" ]]; then
       echo "Processing directory: $URL"
 
       # Fetch the list of files from the URL
       LINKS="$(lynx -dump -listonly -hiddenlinks=listonly $URL?r=$random_chars | awk '{print $2}' | uniq)"
 
       if [[ -z "$LINKS" ]]; then
-        echo "Failed to fetch content from $URL."
+        echo "Failed to fetch content from $URL"
         continue
       fi
 
       # Extract matching links
-      TORRENT_LINKS=$(echo "$LINKS" | grep -E "^.*\\.torrent$")
-      MATCHING_LINKS=$(echo "$TORRENT_LINKS" | grep -P "$REGEX")
+      MATCHING_LINKS=$(echo "$LINKS")
+      if [[ -n "$REGEX" ]]; then
+        MATCHING_LINKS=$(echo "$LINKS" | grep -P "$REGEX")
+      fi
 
       if [[ -z "$MATCHING_LINKS" ]]; then
-        echo "No matching files found at $URL."
+        echo "No matching files found at $URL"
         continue
       fi
 
@@ -129,41 +141,41 @@ while IFS= read -r line; do
           LINK="$URL/$LINK"
         fi
 
-        FILENAME=$(basename "$LINK")
-        curl -s -o "$DOWNLOAD_DIR/$FILENAME" "$LINK"
+        FILENAME=$(basename "$LINK$SUFFIX")
+        curl -s -o "$DOWNLOAD_DIR/$FILENAME" "$LINK$SUFFIX"
 
         if [[ $? -eq 0 ]]; then
-          echo "$FILENAME downloaded successfully."
+          echo "$FILENAME downloaded successfully"
         else
-          echo "Failed to download $FILENAME."
+          echo "Failed to download $FILENAME"
         fi
       done
 
-      # Reset TYPE, URL, and REGEX for the next block
-      TYPE=""
-      URL=""
-      REGEX=""
-
     elif [[ "$TYPE" == "file" ]]; then
-      echo "Downloading file: $URL"
+      echo "Downloading file: $URL$SUFFIX"
 
-      FILENAME=$(basename "$URL")
-      curl -s -o "$DOWNLOAD_DIR/$FILENAME" "$URL"
+      FILENAME=$(basename "$URL$SUFFIX")
+      curl -s -o "$DOWNLOAD_DIR/$FILENAME" "$URL$SUFFIX"
 
       if [[ $? -eq 0 ]]; then
-        echo "$FILENAME downloaded successfully."
+        echo "$FILENAME downloaded successfully"
       else
-        echo "Failed to download $FILENAME."
+        echo "Failed to download $FILENAME"
       fi
 
-      # Reset TYPE, URL, and REGEX for the next block
-      TYPE=""
-      URL=""
-      REGEX=""
-
     fi
+
+    # Reset TYPE, URL, and REGEX for the next block
+    TYPE=""
+    URL=""
+    REGEX=""
+    SUFFIX=""
+
+    process=0
+
+    echo ""
   fi
 
 done <"$INPUT_FILE"
 
-echo "All specified files and directories have been processed. Downloaded files are in $DOWNLOAD_DIR."
+echo "All specified files and directories have been processed. Downloaded files are in $DOWNLOAD_DIR"

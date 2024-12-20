@@ -1,27 +1,36 @@
 TYPE=from-directory
 URL=https://cdimage.debian.org/debian-cd/current/amd64/bt-cd/
-REGEX=^((?!edu|mac).)*$
+REGEX=^((?!edu|mac).)*torrent$
 
 TYPE=from-directory
 URL=https://mirrors.edge.kernel.org/archlinux/iso/latest/
-REGEX=.*
+REGEX=.*torrent$
 
 TYPE=select-latest-directory
 URL=https://downloads.raspberrypi.com/raspios_armhf/images/
-REGEX=.*
+REGEX=.*torrent$
+
+TYPE=select-latest-directory
+URL=https://downloads.raspberrypi.com/raspios_arm64/images/
+REGEX=.*torrent$
 
 TYPE=select-latest-file
 URL=https://torrent.fedoraproject.org/torrents/
-REGEX=.*Workstation-Live-x86_64.*
+REGEX=.*Workstation-Live-x86_64.*torrent$
 
 TYPE=select-latest-file
 URL=https://torrent.fedoraproject.org/torrents/
-REGEX=.*KDE-Live-x86_64.*
+REGEX=.*KDE-Live-x86_64.*torrent$
 
 TYPE=select-latest-file
 URL=https://ubuntu.com/download/alternative-downloads/
-REGEX=.*desktop-amd64.*
+REGEX=.*desktop-amd64.*torrent$
 
 TYPE=select-latest-file
 URL=https://ubuntu.com/download/alternative-downloads/
-REGEX=.*live-server-amd64.*
+REGEX=.*live-server-amd64.*torrent$
+
+TYPE=select-latest-file
+URL=https://manjaro.org/products/download/x86
+REGEX=.*manjaro-kde.*
+SUFFIX=.torrent
