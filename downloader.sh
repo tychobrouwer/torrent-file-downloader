@@ -39,6 +39,8 @@ while IFS= read -r line; do
   URL=$(echo $URL | tr -d '\r')
   REGEX=$(echo $REGEX | tr -d '\r')
 
+  random_chars=$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c 8)
+
   # Ensure TYPE and URL are set
   if [[ -n "$TYPE" && -n "$URL" ]]; then
     # Select lastest directory from URL
@@ -46,7 +48,7 @@ while IFS= read -r line; do
       echo "Processing latest directory: $URL"
 
       # Fetch the list of directories from the URL
-      LINKS="$(lynx -dump -listonly -hiddenlinks=listonly $URL | awk '{print $2}' | uniq)"
+      LINKS="$(lynx -dump -listonly -hiddenlinks=listonly $URL?r=$random_chars | awk '{print $2}' | uniq)"
 
       if [[ -z "$LINKS" ]]; then
         echo "Failed to fetch content from $URL."
@@ -76,7 +78,7 @@ while IFS= read -r line; do
       echo "Processing latest file: $URL"
 
       # Fetch the list of files from the URL
-      LINKS="$(lynx -dump -listonly -hiddenlinks=listonly $URL | awk '{print $2}' | uniq)"
+      LINKS="$(lynx -dump -listonly -hiddenlinks=listonly $URL?r=$random_chars | awk '{print $2}' | uniq)"
 
       if [[ -z "$LINKS" ]]; then
         echo "Failed to fetch content from $URL."
@@ -100,7 +102,7 @@ while IFS= read -r line; do
       echo "Processing directory: $URL"
 
       # Fetch the list of files from the URL
-      LINKS="$(lynx -dump -listonly -hiddenlinks=listonly $URL | awk '{print $2}' | uniq)"
+      LINKS="$(lynx -dump -listonly -hiddenlinks=listonly $URL?r=$random_chars | awk '{print $2}' | uniq)"
 
       if [[ -z "$LINKS" ]]; then
         echo "Failed to fetch content from $URL."

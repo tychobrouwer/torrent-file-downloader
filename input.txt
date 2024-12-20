@@ -13,3 +13,15 @@ REGEX=.*
 TYPE=select-latest-file
 URL=https://torrent.fedoraproject.org/torrents/
 REGEX=.*Workstation-Live-x86_64.*
+
+TYPE=select-latest-file
+URL=https://torrent.fedoraproject.org/torrents/
+REGEX=.*KDE-Live-x86_64.*
+
+TYPE=select-latest-file
+URL=https://ubuntu.com/download/alternative-downloads/
+REGEX=.*desktop-amd64.*
+
+TYPE=select-latest-file
+URL=https://ubuntu.com/download/alternative-downloads/
+REGEX=.*live-server-amd64.*
