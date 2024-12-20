@@ -96,6 +96,11 @@ while IFS= read -r line; do
       # Select the latest file
       TYPE="file"
       URL=$(echo "$MATCHING_LINKS" | sort -r | head -n 1)
+
+      if [[ -z "$URL" ]]; then
+        echo "Failed to select the latest file from $URL."
+        continue
+      fi
     fi
 
     if [[ "$TYPE" == "from-directory" && -n "$REGEX" ]]; then
