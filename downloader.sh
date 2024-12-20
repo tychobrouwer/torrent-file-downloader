@@ -18,8 +18,10 @@ TYPE=""
 URL=""
 REGEX=""
 while IFS= read -r line; do
-  # Skip empty lines and comments
-  [[ -z "$line" || "$line" =~ ^# ]] && continue
+  # Skip lines not starting with TYPE, URL, or REGEX
+  if [[ ! "$line" =~ ^TYPE= && ! "$line" =~ ^URL= && ! "$line" =~ ^REGEX= ]]; then
+    continue
+  fi
 
   # Parse TYPE, URL, and REGEX
   if [[ "$line" =~ ^TYPE=(.+)$ ]]; then
@@ -39,7 +41,62 @@ while IFS= read -r line; do
 
   # Ensure TYPE and URL are set
   if [[ -n "$TYPE" && -n "$URL" ]]; then
-    if [[ "$TYPE" == "directory" && -n "$REGEX" ]]; then
+    # Select lastest directory from URL
+    if [[ "$TYPE" == "select-latest-directory" ]]; then
+      echo "Processing latest directory: $URL"
+
+      # Fetch the list of directories from the URL
+      LINKS="$(lynx -dump -listonly -hiddenlinks=listonly $URL | awk '{print $2}' | uniq)"
+
+      if [[ -z "$LINKS" ]]; then
+        echo "Failed to fetch content from $URL."
+        continue
+      fi
+
+      # Extract directories
+      DIRECTORIES=$(echo "$LINKS" | grep -E "^.*\/$")
+
+      if [[ -z "$DIRECTORIES" ]]; then
+        echo "No directories found at $URL."
+        continue
+      fi
+
+      # Select the latest directory
+      TYPE="from-directory"
+      URL=$(echo "$DIRECTORIES" | sort -r | head -n 1)
+
+      if [[ -z "$URL" ]]; then
+        echo "Failed to select the latest directory from $URL."
+        continue
+      fi
+    fi
+
+    # Select lastest file from URL
+    if [[ "$TYPE" == "select-latest-file" && -n "$REGEX" ]]; then
+      echo "Processing latest file: $URL"
+
+      # Fetch the list of files from the URL
+      LINKS="$(lynx -dump -listonly -hiddenlinks=listonly $URL | awk '{print $2}' | uniq)"
+
+      if [[ -z "$LINKS" ]]; then
+        echo "Failed to fetch content from $URL."
+        continue
+      fi
+
+      TORRENT_LINKS=$(echo "$LINKS" | grep -E "^.*\\.torrent$")
+      MATCHING_LINKS=$(echo "$TORRENT_LINKS" | grep -P "$REGEX")
+
+      if [[ -z "$MATCHING_LINKS" ]]; then
+        echo "No matching files found at $URL."
+        continue
+      fi
+
+      # Select the latest file
+      TYPE="file"
+      URL=$(echo "$MATCHING_LINKS" | sort -r | head -n 1)
+    fi
+
+    if [[ "$TYPE" == "from-directory" && -n "$REGEX" ]]; then
       echo "Processing directory: $URL"
 
       # Fetch the list of files from the URL
@@ -66,7 +123,6 @@ while IFS= read -r line; do
         fi
 
         FILENAME=$(basename "$LINK")
-        echo "Downloading $FILENAME..."
         curl -s -o "$DOWNLOAD_DIR/$FILENAME" "$LINK"
 
         if [[ $? -eq 0 ]]; then
