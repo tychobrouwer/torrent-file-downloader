@@ -39,7 +39,3 @@ TYPE=select-latest-file
 URL=https://manjaro.org/products/download/x86
 REGEX=.*manjaro-gnome.*
 SUFFIX=.torrent
-
-TYPE=select-latest-directory
-URL=https://mirrors.evoluso.com/linuxmint/linuxmint/stable/
-REGEX=.*cinnamon.*
