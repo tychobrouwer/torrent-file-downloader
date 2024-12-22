@@ -39,3 +39,7 @@ TYPE=select-latest-file
 URL=https://manjaro.org/products/download/x86
 REGEX=.*manjaro-gnome.*
 SUFFIX=.torrent
+
+TYPE=select-latest-file
+URL=https://rockylinux.org/download
+REGEX=.*dvd.torrent$
