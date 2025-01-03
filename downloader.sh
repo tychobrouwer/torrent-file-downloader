@@ -60,6 +60,11 @@ while IFS= read -r line; do
 
       if [[ -z "$LINKS" ]]; then
         echo "Failed to fetch content from $URL"
+
+        TYPE=""
+        URL=""
+        REGEX=""
+        SUFFIX=""
         continue
       fi
 
@@ -68,6 +73,11 @@ while IFS= read -r line; do
 
       if [[ -z "$DIRECTORIES" ]]; then
         echo "No directories found at $URL"
+
+        TYPE=""
+        URL=""
+        REGEX=""
+        SUFFIX=""
         continue
       fi
 
@@ -77,6 +87,11 @@ while IFS= read -r line; do
 
       if [[ -z "$URL" ]]; then
         echo "Failed to select the latest directory from $URL"
+
+        TYPE=""
+        URL=""
+        REGEX=""
+        SUFFIX=""
         continue
       fi
     fi
@@ -90,6 +105,11 @@ while IFS= read -r line; do
 
       if [[ -z "$LINKS" ]]; then
         echo "Failed to fetch content from $URL"
+
+        TYPE=""
+        URL=""
+        REGEX=""
+        SUFFIX=""
         continue
       fi
 
@@ -100,6 +120,11 @@ while IFS= read -r line; do
 
       if [[ -z "$MATCHING_LINKS" ]]; then
         echo "No matching files found at $URL"
+
+        TYPE=""
+        URL=""
+        REGEX=""
+        SUFFIX=""
         continue
       fi
 
@@ -109,6 +134,11 @@ while IFS= read -r line; do
 
       if [[ -z "$URL" ]]; then
         echo "Failed to select the latest file from $URL"
+
+        TYPE=""
+        URL=""
+        REGEX=""
+        SUFFIX=""
         continue
       fi
     fi
@@ -121,6 +151,11 @@ while IFS= read -r line; do
 
       if [[ -z "$LINKS" ]]; then
         echo "Failed to fetch content from $URL"
+
+        TYPE=""
+        URL=""
+        REGEX=""
+        SUFFIX=""
         continue
       fi
 
@@ -132,6 +167,11 @@ while IFS= read -r line; do
 
       if [[ -z "$MATCHING_LINKS" ]]; then
         echo "No matching files found at $URL"
+
+        TYPE=""
+        URL=""
+        REGEX=""
+        SUFFIX=""
         continue
       fi
 
