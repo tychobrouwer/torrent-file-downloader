@@ -179,5 +179,6 @@ while IFS= read -r line; do
 done <"$INPUT_FILE"
 
 chmod -R 777 ./watched
+chown -R qbittorrent:qbittorrent ./watched
 
 echo "All specified files and directories have been processed. Downloaded files are in $DOWNLOAD_DIR"
