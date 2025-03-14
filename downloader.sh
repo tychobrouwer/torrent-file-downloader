@@ -61,6 +61,11 @@ process_block() {
     fi
   fi
 
+  TYPE=""
+  URL=""
+  REGEX=""
+  SUFFIX=""
+
   echo ""
 }
 
