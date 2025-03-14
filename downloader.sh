@@ -5,7 +5,7 @@ INPUT_FILE="input.txt"
 
 if [[ ! -f $INPUT_FILE ]]; then
   echo "Input file '$INPUT_FILE' not found! Please create it with the following format:"
-  echo -e "TYPE=directory|file\nURL=https://example.com/path/to/resource\nREGEX=optional_regex\n\nRepeat the above lines for multiple entries"
+  echo -e "TYPE=select-latest-directory|select-latest-file|from-directory|file\nURL=https://example.com/path/to/resource\nREGEX=optional_regex\n\nRepeat the above lines for multiple entries"
   exit 1
 fi
 
