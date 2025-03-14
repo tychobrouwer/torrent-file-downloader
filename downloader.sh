@@ -14,12 +14,7 @@ DOWNLOAD_DIR="watched"
 mkdir -p "$DOWNLOAD_DIR"
 
 # Function to process a block
-process_block() {
-  local TYPE="$1"
-  local URL="$2"
-  local REGEX="$3"
-  local SUFFIX="$4"
-  
+process_block() {  
   if [[ -n "$TYPE" && -n "$URL" ]]; then
     random_chars=$(tr -dc 'a-zA-Z0-9' </dev/urandom | head -c 8)
 
@@ -61,11 +56,6 @@ process_block() {
     fi
   fi
 
-  TYPE=""
-  URL=""
-  REGEX=""
-  SUFFIX=""
-
   echo ""
 }
 
@@ -84,12 +74,17 @@ while IFS= read -r line || [[ -n "$line" ]]; do
   fi
 
   if [[ "$line" == "" ]]; then
-    process_block "$TYPE" "$URL" "$REGEX" "$SUFFIX"
+    process_block
+    
+    TYPE=""
+    URL=""
+    REGEX=""
+    SUFFIX=""
   fi
 done <"$INPUT_FILE"
 
 # Process the last block if not already processed
-process_block "$TYPE" "$URL" "$REGEX" "$SUFFIX"
+process_block
 
 chmod -R 777 ./watched
 chown -R qbittorrent:qbittorrent ./watched
