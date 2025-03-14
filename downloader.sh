@@ -113,7 +113,7 @@ while IFS= read -r line || [[ -n "$line" ]]; do
 
       MATCHING_LINKS=$(echo "$LINKS")
       if [[ -n "$REGEX" ]]; then
-        MATCHING_LINKS=$(echo "$LINKS" | grep -P "$REGEX")
+        MATCHING_LINKS=$(echo "$LINKS" | grep -P "$REGEX" | grep -P "^(?!magnet:).*$")
       fi
 
       if [[ -z "$MATCHING_LINKS" ]]; then
