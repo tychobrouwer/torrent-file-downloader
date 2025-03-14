@@ -87,6 +87,6 @@ done <"$INPUT_FILE"
 process_block "$TYPE" "$URL" "$REGEX" "$SUFFIX"
 
 chmod -R 777 ./watched
-chown -R wsl:wsl ./watched
+chown -R qbittorrent:qbittorrent ./watched
 
 echo "All specified files and directories have been processed. Downloaded files are in $DOWNLOAD_DIR"
