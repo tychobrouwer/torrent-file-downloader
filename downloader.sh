@@ -13,8 +13,6 @@ fi
 DOWNLOAD_DIR="watched"
 mkdir -p "$DOWNLOAD_DIR"
 
-echo "" >>"$INPUT_FILE"
-
 # Process each block in the input file
 TYPE=""
 URL=""
@@ -23,11 +21,11 @@ SUFFIX=""
 
 process=0
 
-while IFS= read -r line; do
+while IFS= read -r line || [[ -n "$line" ]]; do
   line=$(echo $line | tr -d '\r')
 
   # Skip lines not starting with TYPE, URL, or REGEX
-  if [[ ! "$line" =~ ^TYPE= && ! "$line" =~ ^URL= && ! "$line" =~ ^REGEX= && ! "$line" =~ ^SUFFIX= && $line != "" ]]; then
+  if [[ ! "$line" =~ ^TYPE= && ! "$line" =~ ^URL= && ! "$line" =~ ^REGEX= && ! "$line" =~ ^SUFFIX= && "$line" != "" ]]; then
     continue
   fi
 
